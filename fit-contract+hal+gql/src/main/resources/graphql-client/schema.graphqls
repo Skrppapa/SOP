@@ -1,0 +1,107 @@
+type Client {
+    id: ID!
+    firstName: String
+    lastName: String
+    birthDate: String
+    city: String
+    memberships: [Membership]
+}
+
+type Membership {
+    id: ID!
+    membershipNumber: String!
+    duration: String!
+    level: String!
+    client: Client
+    clientId: ID!
+}
+
+type ClientPage {
+    content: [Client]
+    pageNumber: Int
+    pageSize: Int
+    totalElements: Int
+    totalPages: Int
+    last: Boolean
+}
+
+type MembershipPage {
+    content: [Membership]
+    pageNumber: Int
+    pageSize: Int
+    totalElements: Int
+    totalPages: Int
+    last: Boolean
+}
+
+type Query {
+    # Клиенты
+    clients(
+        city: String
+        firstName: String
+        lastName: String
+        page: Int = 0
+        size: Int = 10
+    ): ClientPage
+
+    clientById(id: ID!): Client
+
+    # Абонементы
+    memberships(
+        membershipNumber: String
+        level: String
+        clientId: ID
+        page: Int = 0
+        size: Int = 10
+    ): MembershipPage
+
+    membershipById(id: ID!): Membership
+
+    # Специальные запросы
+    clientMemberships(clientId: ID!): [Membership]
+    membershipByNumber(membershipNumber: String!): Membership
+}
+
+input ClientInput {
+    firstName: String!
+    lastName: String!
+    birthDate: String!
+    city: String!
+}
+
+input UpdateClientInput {
+    firstName: String
+    lastName: String
+    birthDate: String
+    city: String
+}
+
+input MembershipInput {
+    membershipNumber: String!
+    duration: String!
+    level: String!
+    clientId: ID!
+}
+
+input UpdateMembershipInput {
+    membershipNumber: String
+    duration: String
+    level: String
+    clientId: ID
+}
+
+type Mutation {
+    # Операции с клиентами
+    createClient(input: ClientInput!): Client
+    updateClient(id: ID!, input: UpdateClientInput!): Client
+    deleteClient(id: ID!): ID
+
+    # Операции с абонементами
+    createMembership(input: MembershipInput!): Membership
+    updateMembership(id: ID!, input: UpdateMembershipInput!): Membership
+    deleteMembership(id: ID!): ID
+
+    # Специальные операции
+    renewMembership(id: ID!, newDuration: String!): Membership
+    changeMembershipLevel(id: ID!, newLevel: String!): Membership
+}
